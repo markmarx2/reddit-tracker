@@ -11,8 +11,8 @@
   --accent-soft: #fff0e9;
   --error-bg: #fdecea;
   --error-text: #9f1d14;
-  --info-bg: #eaf2fb;
-  --info-text: #1d4a73;
+  --warn-bg: #fff4dc;
+  --warn-text: #7a4a00;
   --focus: #2f6fdf;
   --radius: 12px;
   --shadow: 0 1px 2px rgb(16 24 32 / 0.06);
@@ -33,8 +33,8 @@
     --accent-soft: #33200f;
     --error-bg: #3a1714;
     --error-text: #ffb4ab;
-    --info-bg: #15263a;
-    --info-text: #a9cdf2;
+    --warn-bg: #352708;
+    --warn-text: #f5cf7a;
     --focus: #7aa7ff;
     --shadow: none;
     color-scheme: dark;
@@ -226,9 +226,21 @@ input {
   background: var(--error-bg);
 }
 
-.notice.info {
-  color: var(--info-text);
-  background: var(--info-bg);
+.notice.warn {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+
+.notice .link-button {
+  margin-top: 0;
+  color: inherit;
+  text-decoration: underline;
+}
+
+.fine-print {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--muted);
 }
 
 /* Results */
@@ -244,21 +256,36 @@ input {
 }
 
 .avatar {
-  width: 52px;
-  height: 52px;
-  flex: none;
-  object-fit: cover;
-  background: var(--surface-muted);
-  border-radius: 50%;
-}
-
-.avatar-fallback {
   display: grid;
   place-items: center;
-  font-size: 22px;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  font-size: 21px;
   font-weight: 700;
   color: var(--accent);
   background: var(--accent-soft);
+  border-radius: 50%;
+}
+
+.profile-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.secondary {
+  flex: none;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  background: var(--surface-muted);
 }
 
 .profile-name {
@@ -391,6 +418,12 @@ input {
   font-weight: 600;
   color: var(--error-text);
   background: var(--error-bg);
+}
+
+.tag-status {
+  font-weight: 600;
+  color: var(--warn-text);
+  background: var(--warn-bg);
 }
 
 .card-title {
@@ -529,6 +562,10 @@ input {
   font-size: 13px;
   text-align: center;
   color: var(--muted);
+}
+
+.site-footer a {
+  color: inherit;
 }
 
 @media (max-width: 520px) {

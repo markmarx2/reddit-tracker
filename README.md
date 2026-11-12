@@ -1,46 +1,32 @@
 # Reddit Tracker
 
-Search for a Reddit user and see their **posts from the last 14 days** or their **comments from the last 7 days**. You can filter by community, sort by newest or top, and share a lookup by link (`/?u=spez&type=comments`).
+Search for a Reddit user and see their **posts from the last 14 days** or their **comments from the last 7 days**. New activity usually shows up within a few minutes of being posted.
 
-Built with Next.js and ready to deploy on Vercel.
+You can filter by community, sort by newest or top, and share a lookup by link, for example `/?u=spez&type=comments`.
 
-## Where the data comes from
-
-The server uses one of two sources:
-
-| | Reddit's official API | Arctic Shift archive (fallback) |
-|---|---|---|
-| When it's used | When `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` are set | When they aren't set |
-| Setup | Needs a Reddit API app (see below) | None |
-| Scores and comment counts | Live | Can lag by up to ~36 hours |
-| Karma, avatar, join date | Yes | No |
-| Deleted items | Hidden | May still appear |
-| Reliability | High | Free community service with no uptime guarantee. It is sometimes overloaded and returns an error. |
-
-Reddit's logged-out `.json` and RSS endpoints aren't used. They return 403 or 429 errors to scripts, especially from cloud servers like Vercel.
+No API key or setup is needed.
 
 ## Deploy to Vercel
 
 1. Go to [vercel.com/new](https://vercel.com/new) and import this GitHub repository.
-2. Leave the defaults. Vercel detects Next.js automatically.
-3. Optional: add the Reddit API environment variables (below) under **Settings → Environment Variables**, then redeploy.
-4. Click **Deploy**.
+2. Click **Deploy**. Vercel detects Next.js automatically. There are no environment variables to set.
 
-Every push to `main` redeploys the site automatically.
+Every push to `main` redeploys the site.
 
-## Getting Reddit API credentials (optional)
+## Where the data comes from
 
-1. Sign in to Reddit and open [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps).
-2. Click **create another app**, choose **script**, and enter any redirect URI (for example `http://localhost:3000`).
-3. Copy the ID under the app name (`REDDIT_CLIENT_ID`) and the **secret** (`REDDIT_CLIENT_SECRET`).
+Reddit closed its API to new developers on October 31, 2026, and blocks logged-out requests from scripts. This site uses the [Arctic Shift](https://github.com/ArthurHeitmann/arctic_shift) archive instead. Arctic Shift saves new Reddit posts and comments within minutes. In testing, the newest items were 1 to 11 minutes old.
 
-Since late 2025, Reddit's Responsible Builder Policy says new API access must be approved by Reddit. If Reddit rejects the credentials, the site shows an error that says so. Remove the variables to switch back to the archive.
+The lookup runs in the visitor's browser and calls the archive directly, so each visitor stays within the archive's limits on their own.
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `REDDIT_CLIENT_ID` | For the official API | Your app's client ID |
-| `REDDIT_CLIENT_SECRET` | For the official API | Your app's secret |
-| `REDDIT_USER_AGENT` | No | A descriptive User-Agent, as Reddit asks, for example `web:reddit-tracker:1.0.0 (by /u/your_name)` |
+**Things to know:**
+
+- **Scores and comment counts** are saved about 36 hours after something is posted. Until then the site shows "Score pending" rather than a wrong number.
+- **Deleted and removed items still appear** if the archive saved them first. They're tagged, for example "Deleted by user" or "Removed by mods".
+- **The archive is a free service** that often turns away requests when it's busy. The site retries automatically. If part of a time range keeps failing, it splits that range into smaller pieces and tries again. Any period it still can't load is shown with a **Try again** button.
+- **Very active accounts** show their newest 1,000 items.
+- **A misspelled username** shows "no activity". The archive can't tell a quiet account from one that doesn't exist.
+- The archive may be affected when Reddit shuts down its public API in March 2027.
 
 ## Run it locally
 
@@ -48,17 +34,15 @@ Requires Node.js 20 or newer.
 
 ```bash
 npm install
-cp .env.example .env.local   # optional: add your Reddit credentials
 npm run dev
 ```
 
 Then open http://localhost:3000.
 
-## How it works
+## Code
 
-- [app/api/reddit/route.ts](app/api/reddit/route.ts): `GET /api/reddit?user=<name>&type=posts|comments`. It validates the input, picks a source, and returns JSON. Vercel's CDN caches each lookup for 2 minutes to save API quota.
-- [lib/reddit-api.ts](lib/reddit-api.ts): app-only OAuth with Reddit. It pages through the user's newest items until it passes the 7- or 14-day cutoff. Reddit returns at most ~1,000 items per user.
-- [lib/arctic-shift.ts](lib/arctic-shift.ts): the same lookup against the Arctic Shift archive.
-- [components/Tracker.tsx](components/Tracker.tsx): the search page.
+- [lib/archive.ts](lib/archive.ts) runs the lookup: retries, splitting failed ranges, and paging.
+- [lib/normalize.ts](lib/normalize.ts) converts archived Reddit records into what the page shows.
+- [components/Tracker.tsx](components/Tracker.tsx) is the search page.
 
 This site isn't affiliated with Reddit, Inc.
