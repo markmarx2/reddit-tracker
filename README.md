@@ -28,12 +28,14 @@ The lookup runs in the visitor's browser and calls the archive directly, so each
 - **A misspelled username** shows "no activity". The archive can't tell a quiet account from one that doesn't exist.
 - The archive may be affected when Reddit shuts down its public API in March 2027.
 
-## Run it locally
+## Run it on your computer
 
-Requires Node.js 20 or newer.
+**Windows:** double-click **Start Reddit Tracker.bat** in this folder. The first time, it installs what's needed. It then starts the site and opens http://localhost:3000. Keep its window open while you use the site, and close it to stop.
+
+**Any system:** you need Node.js 20 or newer. Open a terminal in this folder (not your home folder), then run:
 
 ```bash
-npm install
+npm install   # first time only
 npm run dev
 ```
 
